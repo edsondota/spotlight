@@ -20,7 +20,7 @@
           </ul>
         </div>
         <p class="movie-details-wrapper__info__release_date">
-          {{ movie.release_date }}
+          {{ movie.release_date | moment }}
         </p>
         <p class="movie-details-wrapper__info__overview">
           {{ movie.overview }}
@@ -31,6 +31,8 @@
 </template>
 
 <script>
+import * as moment from 'moment';
+
 export default {
   name: 'Details',
   data: () => ({
@@ -62,6 +64,10 @@ export default {
     posterFullPath() {
       return `https://image.tmdb.org/t/p/w500${this.movie.poster_path}`;
     },
+  },
+
+  filters: {
+    moment: date => moment(date).format('MMM Do YYYY'),
   },
 };
 </script>
