@@ -24,3 +24,8 @@ npm run test
 ```
 npm run lint
 ```
+
+### Run API
+```
+npm run express
+```
