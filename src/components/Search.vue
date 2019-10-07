@@ -18,6 +18,9 @@
           @click="searchMovie"
         >Search</button>
       </div>
+      <div class="search-wrapper__alert-no-results" v-if="showNoResults">
+        No results were found for your search.
+      </div>
       <ul
         v-show="movies.length > 0"
         class="search-wrapper__auto-complete">
@@ -61,14 +64,23 @@ export default {
       searchText: '',
       movies: [],
       movie: null,
+      showNoResults: false,
     };
   },
 
   methods: {
     searchMovie() {
+      this.showNoResults = false;
       if (this.searchText.length > 2) {
         const movieResults = searchMovie(this.searchText);
-        movieResults.then(res => Vue.set(this, 'movies', res.data.data.upcomingMovies));
+        movieResults.then((res) => {
+          if (res.data.data.upcomingMovies) {
+            Vue.set(this, 'movies', res.data.data.upcomingMovies);
+          } else {
+            this.movies = [];
+            this.showNoResults = true;
+          }
+        });
       }
     },
 
@@ -94,9 +106,17 @@ export default {
 
   watch: {
     searchText() {
-      if (this.searchText.length > 1) {
+      this.showNoResults = false;
+      if (this.searchText.length > 2) {
         const movieResults = searchMovie(this.searchText);
-        movieResults.then(res => Vue.set(this, 'movies', res.data.data.upcomingMovies));
+        movieResults.then((res) => {
+          if (res.data.data.upcomingMovies) {
+            Vue.set(this, 'movies', res.data.data.upcomingMovies);
+          } else {
+            this.movies = [];
+            this.showNoResults = true;
+          }
+        });
       } else {
         this.movies = [];
       }
@@ -156,6 +176,12 @@ export default {
           cursor: pointer;
         }
       }
+    }
+
+    &__alert-no-results {
+      flex-basis: 100%;
+      font-size: .8em;
+      padding-top: .8em;
     }
 
     &__auto-complete {
