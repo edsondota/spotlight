@@ -15,7 +15,7 @@ module.exports = buildSchema(`
   type Query {
     genres: [Genre]
     genre(id: Int): Genre
-    upcomingMovies(page: Int): [UpcomingMovie]
+    upcomingMovies(search: String): [UpcomingMovie]
     upcomingMovie(id: Int): UpcomingMovie
   }
 `);
