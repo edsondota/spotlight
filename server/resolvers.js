@@ -42,7 +42,10 @@ module.exports = {
         movies.forEach((movie, index) => {
           movies[index].genres = getGenreByIds(movie.genre_ids);
         });
-        return movies.filter(movie => movie.title.toLowerCase().indexOf(search.toLowerCase()) !== -1);
+        return movies.filter((movie) => {
+          const title = movie.title.toLowerCase();
+          return title.indexOf(search.toLowerCase()) !== -1;
+        });
       });
   },
   upcomingMovie({ id }) {

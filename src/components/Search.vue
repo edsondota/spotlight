@@ -18,18 +18,40 @@
           @click="searchMovie"
         >Search</button>
       </div>
+      <ul
+        v-show="movies.length > 0"
+        class="search-wrapper__auto-complete">
+        <li
+          v-for="movie in movies"
+          v-bind:key="movie.id"
+          @click="showMovieDetails(movie.id)">
+          {{ movie.title}}
+          <em>{{ movie.release_date | moment }}</em>
+        </li>
+      </ul>
     </section>
-    <ul>
-      <li v-for="movie in movies" v-bind:key="movie.id">
-        {{ movie.title}}
-      </li>
-    </ul>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import Vue from 'vue';
+import * as moment from 'moment';
+
+const searchMovie = searchText => axios.post('http://localhost:3000/graphql', {
+  query: `{
+            upcomingMovies ( search: "${searchText}") {
+              id,
+              title,
+              overview,
+              release_date,
+              genres {
+                id,
+                name
+              }
+            }
+        }`,
+});
 
 export default {
   name: 'Search',
@@ -37,15 +59,23 @@ export default {
   data() {
     return {
       searchText: '',
-      movies: null,
-    }
+      movies: [],
+      movie: null,
+    };
   },
 
   methods: {
-    searchMovie: function () {
+    searchMovie() {
+      if (this.searchText.length > 2) {
+        const movieResults = searchMovie(this.searchText);
+        movieResults.then(res => Vue.set(this, 'movies', res.data.data.upcomingMovies));
+      }
+    },
+
+    showMovieDetails: (id) => {
       axios.post('http://localhost:3000/graphql', {
         query: `{
-                  upcomingMovies ( search: "${this.searchText}") {
+                  upcomingMovie ( id: ${id}) {
                     id,
                     title,
                     overview,
@@ -57,15 +87,24 @@ export default {
                   }
               }`,
       }).then((res) => {
-        console.log(res.data);
-        Vue.set(this, 'movies', res.data.data.upcomingMovies);
+        this.movie = res.data.data.upcomingMovie;
       });
     },
   },
 
   watch: {
-    searchText: function () {
-    }
+    searchText() {
+      if (this.searchText.length > 1) {
+        const movieResults = searchMovie(this.searchText);
+        movieResults.then(res => Vue.set(this, 'movies', res.data.data.upcomingMovies));
+      } else {
+        this.movies = [];
+      }
+    },
+  },
+
+  filters: {
+    moment: date => moment(date).format('MMM Do YYYY'),
   },
 
 };
@@ -90,6 +129,8 @@ export default {
     margin: 20px auto;
     width: 80%;
     display: flex;
+    flex-wrap: wrap;
+    position: relative;
 
     &__input {
       flex: 5;
@@ -113,6 +154,31 @@ export default {
 
         &:hover {
           cursor: pointer;
+        }
+      }
+    }
+
+    &__auto-complete {
+      position: absolute;
+      width: 100%;
+      top: 1.8em;
+      flex-basis: 100%;
+
+      li {
+        list-style: none;
+        background: lighten(#4DA8A2, 40%);
+        border: 1px solid #4DA8A2;
+        border-top-width: 0;
+        padding: 5px;
+        display: block;
+
+        em {
+          font-size: .8em;
+        }
+
+        &:hover {
+          cursor: pointer;
+        background: lighten(#4DA8A2, 30%);
         }
       }
     }
