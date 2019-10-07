@@ -13,6 +13,9 @@ Used stack:
 npm install
 ```
 
+Use the `.env.template` file as an example to create your `.env` file.
+The env file should be placed at the project root.
+
 ### Compiles and hot-reloads for development
 ```
 npm run serve
