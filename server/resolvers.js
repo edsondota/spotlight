@@ -5,18 +5,6 @@ require('dotenv').config();
 const API_KEY = process.env.TMDB_API_KEY;
 const URL_BASE = 'https://api.themoviedb.org/3';
 
-const getGenre = (id) => {
-  const action = '/genre/movie/list';
-  return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US`)
-    .then((res) => {
-      const filtered = res.data.genres.filter(genre => genre.id === id);
-      if (filtered) {
-        return filtered[0];
-      }
-      return null;
-    });
-};
-
 const getGenreByIds = (ids) => {
   const action = '/genre/movie/list';
   return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US`)
@@ -31,7 +19,14 @@ const getGenreByIds = (ids) => {
 
 module.exports = {
   genre({ id }) {
-    return getGenre(id);
+    const action = '/genre/movie/list';
+    return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US`)
+      .then((res) => {
+        const filtered = res.data.genres.filter(genre => genre.id === id);
+        if (filtered) return filtered[0];
+
+        return null;
+      });
   },
   genres() {
     const action = '/genre/movie/list';
@@ -49,5 +44,10 @@ module.exports = {
         });
         return movies;
       });
+  },
+  upcomingMovie({ id }) {
+    const action = `/movie/${id}`;
+    return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US}`)
+      .then(res => res.data);
   },
 };

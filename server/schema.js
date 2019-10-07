@@ -16,5 +16,6 @@ module.exports = buildSchema(`
     genres: [Genre]
     genre(id: Int): Genre
     upcomingMovies(page: Int): [UpcomingMovie]
+    upcomingMovie(id: Int): UpcomingMovie
   }
 `);
