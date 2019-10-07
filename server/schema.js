@@ -8,12 +8,13 @@ module.exports = buildSchema(`
   type UpcomingMovie {
     id: ID
     title: String
-    genres: [Genre]
     overview: String
     release_date: String
+    genres: [Genre]
   }
   type Query {
     genres: [Genre]
     genre(id: Int): Genre
+    upcomingMovies(page: Int): [UpcomingMovie]
   }
 `);
