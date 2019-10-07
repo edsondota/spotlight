@@ -33,16 +33,16 @@ module.exports = {
     return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US`)
       .then(res => res.data.genres);
   },
-  upcomingMovies({ page }) {
+  upcomingMovies({ search }) {
     const action = '/movie/upcoming';
-    return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US&page=${page}`)
+    return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US&page=1`)
       .then((res) => {
         const movies = res.data.results;
         movies.genres = [];
         movies.forEach((movie, index) => {
           movies[index].genres = getGenreByIds(movie.genre_ids);
         });
-        return movies;
+        return movies.filter(movie => movie.title.toLowerCase().indexOf(search.toLowerCase()) !== -1);
       });
   },
   upcomingMovie({ id }) {

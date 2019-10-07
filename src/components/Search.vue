@@ -10,18 +10,64 @@
       class="search-wrapper"
     >
       <div class="search-wrapper__input">
-        <input type="text">
+        <input
+        v-model="searchText">
       </div>
       <div class="search-wrapper__button">
-        <button>Search</button>
+        <button
+          @click="searchMovie"
+        >Search</button>
       </div>
     </section>
+    <ul>
+      <li v-for="movie in movies" v-bind:key="movie.id">
+        {{ movie.title}}
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+import Vue from 'vue';
+
 export default {
   name: 'Search',
+
+  data() {
+    return {
+      searchText: '',
+      movies: null,
+    }
+  },
+
+  methods: {
+    searchMovie: function () {
+      axios.post('http://localhost:3000/graphql', {
+        query: `{
+                  upcomingMovies ( search: "${this.searchText}") {
+                    id,
+                    title,
+                    overview,
+                    release_date,
+                    genres {
+                      id,
+                      name
+                    }
+                  }
+              }`,
+      }).then((res) => {
+        console.log(res.data);
+        Vue.set(this, 'movies', res.data.data.upcomingMovies);
+      });
+    },
+  },
+
+  watch: {
+    searchText: function () {
+    }
+  },
+
 };
 </script>
 
