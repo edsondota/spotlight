@@ -28,7 +28,7 @@
           v-for="movie in movies"
           v-bind:key="movie.id"
           @click="selectMovie(movie.id)">
-          {{ movie.title}}
+          {{ movie.original_title}}
           <em>{{ movie.release_date | moment }}</em>
         </li>
       </ul>
@@ -45,7 +45,7 @@ const searchMovie = searchText => axios.post('http://localhost:3000/graphql', {
   query: `{
             upcomingMovies ( search: "${searchText}") {
               id,
-              title,
+              original_title,
               overview,
               release_date,
               genres {
