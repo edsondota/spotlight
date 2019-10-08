@@ -1,56 +1,70 @@
 const axios = require('axios');
+const moment = require('moment');
+const db = require('./database');
 
 require('dotenv').config();
+
+db.init();
 
 const API_KEY = process.env.TMDB_API_KEY;
 const URL_BASE = 'https://api.themoviedb.org/3';
 
-const getGenreByIds = (ids) => {
-  const action = '/genre/movie/list';
-  return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US`)
-    .then((res) => {
-      const filtered = res.data.genres.filter(genre => ids.some(id => genre.id === id));
-      if (filtered) {
-        return filtered;
-      }
-      return null;
-    });
-};
-
 module.exports = {
-  genre({ id }) {
-    const action = '/genre/movie/list';
-    return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US`)
-      .then((res) => {
-        const filtered = res.data.genres.filter(genre => genre.id === id);
-        if (filtered) return filtered[0];
+  async cacheResults() {
+    db.getLastUpdate()
+      .then(async (lastUpdate) => {
+        const { last_update } = lastUpdate;
+        const days = moment().diff(moment(last_update), 'days');
+        if (days > 1) {
+          db.deleteData();
+          let action = '/genre/movie/list';
+          await axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US`)
+            .then((res) => {
+              res.data.genres.forEach(genre => db.insertGenre({ genre }));
+            });
 
-        return null;
+          action = '/movie/upcoming';
+          await axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US&page=1`)
+            .then((res) => {
+              Array(res.data.total_pages).fill().map(async (_, i) => {
+                const page = i + 1;
+                await this.getUpcomingMovies(page)
+                  .then((results) => {
+                    results.data.results.forEach((movie) => {
+                      db.insertMovie({ movie });
+                    });
+                  });
+                return true;
+              });
+            });
+          db.updateInfo();
+        }
       });
+  },
+
+  genre({ id }) {
+    return db.getGenre(id)
+      .then(genre => genre);
   },
   genres() {
-    const action = '/genre/movie/list';
-    return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US`)
-      .then(res => res.data.genres);
+    return db.getGenres()
+      .then(genres => genres);
   },
-  upcomingMovies({ search }) {
-    const action = '/movie/upcoming';
-    return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US&page=1`)
-      .then((res) => {
-        const movies = res.data.results;
-        movies.genres = [];
-        movies.forEach((movie, index) => {
-          movies[index].genres = getGenreByIds(movie.genre_ids);
-        });
-        return movies.filter((movie) => {
-          const title = movie.title.toLowerCase();
-          return title.indexOf(search.toLowerCase()) !== -1;
-        });
-      });
+
+  async upcomingMovies({ search }) {
+    await this.cacheResults();
+    return db.getMovieByTitle(search)
+      .then(movies => movies);
   },
+
   upcomingMovie({ id }) {
-    const action = `/movie/${id}`;
-    return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US}`)
-      .then(res => res.data);
+    return db.getMovie(id)
+      .then(movie => db.getGenreByMovieId(id)
+        .then(genres => ({ ...movie, genres })));
+  },
+
+  getUpcomingMovies(page) {
+    const action = '/movie/upcoming';
+    return axios.get(`${URL_BASE}${action}?api_key=${API_KEY}&language=en-US&page=${page}`);
   },
 };

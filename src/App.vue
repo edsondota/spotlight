@@ -4,7 +4,8 @@
       v-bind:showMovieDetails="showMovieDetails"
     />
     <Details
-      v-bind:movie="movie" />
+      v-if="movie"
+      v-bind:movie="movie || {}" />
   </div>
 </template>
 
@@ -20,16 +21,17 @@ export default {
   },
 
   data: () => ({
-    movie: {},
+    movie: null,
   }),
 
   methods: {
     showMovieDetails(id) {
+      this.movie = null;
       axios.post('http://localhost:3000/graphql', {
         query: `{
                   upcomingMovie ( id: ${id}) {
                     id,
-                    title,
+                    original_title,
                     overview,
                     release_date,
                     poster_path,

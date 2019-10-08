@@ -8,6 +8,8 @@ require('dotenv').config();
 
 app.use(cors());
 
+resolvers.cacheResults();
+
 app.use('/graphql', expressGraphQL({
   schema,
   rootValue: resolvers,

@@ -1,8 +1,6 @@
 <template>
   <div>
-    <div
-      class="movie-details-wrapper"
-      v-if="movie">
+    <div class="movie-details-wrapper">
       <div
         class="movie-details-wrapper__poster">
           <img :src="posterFullPath" alt="">
@@ -10,7 +8,7 @@
       <div
         class="movie-details-wrapper__info">
           <h1>
-            {{ movie.title }}
+            {{ movie.original_title }}
           </h1>
         <div
           class="movie-details-wrapper__info__genres">
