@@ -11,7 +11,7 @@ module.exports = buildSchema(`
     title: String
     overview: String
     release_date: String
-    genres: [Genre]
+    genres: [Genre!]
     poster_path: String
     backdrop_path: String
 

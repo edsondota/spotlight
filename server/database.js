@@ -91,9 +91,15 @@ module.exports = {
   },
 
   getMovieByTitle(title) {
-    return new Promise((resolve) => {
-      db.all('SELECT * FROM Upcomingmovie WHERE original_title LIKE ?', [`%${title}%`], (_, rows) => {
-        resolve(rows);
+    return new Promise(async (resolve) => {
+      db.all('SELECT * FROM Upcomingmovie WHERE original_title LIKE ?', [`%${title}%`], async (_, rows) => {
+        const results = rows;
+        rows.forEach(async (row, index) => {
+          this.getGenreByMovieId(row.id).then((genres) => {
+            results[index] = { ...row, genres };
+          });
+        });
+        resolve(results);
       });
     });
   },
