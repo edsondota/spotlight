@@ -1,10 +1,19 @@
 <template>
   <div id="app">
     <Search
+      v-bind:onChange="onChange"
+      v-bind:searchText="search"
+    />
+    <MovieList
       v-bind:showMovieDetails="showMovieDetails"
+      v-bind:movies="movies"
+      v-bind:search="search"
+      v-bind:movie="movie"
+      v-if="!movie"
     />
     <Details
       v-if="movie"
+      v-bind:searchReturn="() => movie = null"
       v-bind:movie="movie || {}" />
   </div>
 </template>
@@ -13,19 +22,45 @@
 import axios from 'axios';
 import Search from './components/Search.vue';
 import Details from './components/Details.vue';
+import MovieList from './components/MovieList.vue';
 
 export default {
   components: {
     Search,
     Details,
+    MovieList,
   },
 
   data: () => ({
     movie: null,
+    allMovies: [],
+    movies: [],
+    search: '',
   }),
+
+  created() {
+    axios.post('http://localhost:3000/graphql', {
+      query: `{
+                upcomingMovies (search: "") {
+                  id,
+                  original_title,
+                  poster_path,
+                  release_date,
+                  genres {
+                    id,
+                    name
+                  }
+                }
+              }`,
+    }).then((res) => {
+      this.allMovies = res.data.data.upcomingMovies;
+      this.movies = this.allMovies;
+    });
+  },
 
   methods: {
     showMovieDetails(id) {
+      this.search = '';
       this.movie = null;
       axios.post('http://localhost:3000/graphql', {
         query: `{
@@ -45,6 +80,11 @@ export default {
       }).then((res) => {
         this.movie = res.data.data.upcomingMovie;
       });
+    },
+
+    onChange(search) {
+      this.movie = null;
+      this.search = search;
     },
   },
 };

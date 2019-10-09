@@ -10,8 +10,7 @@
           <h1>
             {{ movie.original_title }}
           </h1>
-        <div
-          class="movie-details-wrapper__info__genres">
+        <div class="movie-details-wrapper__info__genres">
           <ul>
             <li v-for="genre in movie.genres" v-bind:key="genre.id">
               {{ genre.name }}
@@ -23,6 +22,12 @@
         </p>
         <p class="movie-details-wrapper__info__overview">
           {{ movie.overview }}
+        </p>
+        <p class="movie-details-wrapper__info__return">
+          <a
+            @click="searchReturn">
+            Return to the Upcoming movie list
+          </a>
         </p>
       </div>
     </div>
@@ -37,6 +42,7 @@ export default {
 
   props: {
     movie: Object,
+    searchReturn: Function,
   },
 
   computed: {
@@ -92,6 +98,20 @@ export default {
 
       &__overview {
         padding-top: 10px;
+      }
+
+      &__return {
+        padding-top: 10px;
+
+        a {
+          color: #4DA8A2;
+          font-size: .8em;
+
+          &:hover {
+            cursor: pointer;
+            text-decoration: underline;
+          }
+        }
       }
     }
   }
