@@ -2,12 +2,15 @@ const express = require('express');
 const expressGraphQL = require('express-graphql');
 const cors = require('cors');
 const path = require('path');
+const db = require('./database');
 const schema = require('./schema');
 const resolvers = require('./resolvers');
 
 require('dotenv').config();
 
 const app = express();
+const port = process.env.PORT || 3000;
+
 
 app.use(cors());
 
@@ -21,7 +24,7 @@ app.use('/graphql', expressGraphQL({
   graphiql: true,
 }));
 
-app.listen(3000, () => {
+app.listen(port, () => {
   // eslint-disable-next-line no-console
-  console.log('Express listening on port 3000');
+  console.log(`Express listening on port ${port}`);
 });

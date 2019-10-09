@@ -24,6 +24,8 @@ import Search from './components/Search.vue';
 import Details from './components/Details.vue';
 import MovieList from './components/MovieList.vue';
 
+const BASE_URL = process.env.VUE_APP_API_URL;
+
 export default {
   components: {
     Search,
@@ -39,7 +41,7 @@ export default {
   }),
 
   created() {
-    axios.post('http://localhost:3000/graphql', {
+    axios.post(`${BASE_URL}/graphql`, {
       query: `{
                 upcomingMovies (search: "") {
                   id,
@@ -62,7 +64,7 @@ export default {
     showMovieDetails(id) {
       this.search = '';
       this.movie = null;
-      axios.post('http://localhost:3000/graphql', {
+      axios.post(`${BASE_URL}/graphql`, {
         query: `{
                   upcomingMovie ( id: ${id}) {
                     id,
