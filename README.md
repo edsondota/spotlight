@@ -2,6 +2,8 @@
 
 This app shows a list of upcoming movies using the TMDb API.
 
+To see this app running, please, [click here](https://dota-spotlight.herokuapp.com/).
+
 The project uses JavaScript both in the backend and frontend. To the backend, the ExpressJS was chosen because of its simplicity, performance, deployability.
 
 I also used sqlite3 and graphql. The sqlite3 database to storage all upcoming movies fetched from TMDb, and graphql as API technology. I'm not a novice in graphql, and I didn't use this on my regular job. It's the very first time that I use a backend written in JavaScript, and also graphql. Apologies if I missed something, but I enjoy to used the test to learn new things.

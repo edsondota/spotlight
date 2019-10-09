@@ -2,7 +2,6 @@ const express = require('express');
 const expressGraphQL = require('express-graphql');
 const cors = require('cors');
 const path = require('path');
-const db = require('./database');
 const schema = require('./schema');
 const resolvers = require('./resolvers');
 
