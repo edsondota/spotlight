@@ -1,4 +1,4 @@
-# spotlight
+# Spotlight
 
 This app shows a list of upcoming movies using the TMDb API.
 
